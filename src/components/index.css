@@ -1,0 +1,108 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f5;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.container {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #333333;
+}
+
+input, select, button {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+p {
+  color: #ff0000;
+}
+.admin-container {
+  padding: 20px;
+  
+}
+
+.admin-section {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-users, .admin-questions {
+  flex: 1;
+  min-width: 300px;
+}
+
+.admin-users table, .admin-questions ul {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-users table th, .admin-users table td, .admin-questions ul li {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.admin-users table th {
+  background-color: #f4f4f4;
+  text-align: left;
+}
+
+.admin-questions input, .admin-questions select, .admin-questions button, .admin-users button {
+  margin: 5px 0;
+}
+.option-button {
+  display: inline-block;
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.option-button:hover {
+  background-color: #e0e0e0;
+}
+
+.option-button.selected {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
