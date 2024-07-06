@@ -254,7 +254,7 @@ const AdminPanel = () => {
             <ul>
               {tokens.map((token) => (
                 <li key={token._id}>
-                  {token.token}
+                  {token.value}
                   <button className="delete-button" onClick={() => handleDeleteToken(token._id)}>Excluir</button>
                 </li>
               ))}

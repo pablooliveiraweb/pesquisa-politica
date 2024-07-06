@@ -40,8 +40,8 @@ router.get('/by-neighborhood', async (req, res) => {
     let totalRespondents = 0;
 
     questionnaires.forEach((questionnaire) => {
+      totalRespondents++;
       if (questionnaire.formData && questionnaire.formData.neighborhood) {
-        totalRespondents++;
         const neighborhood = questionnaire.formData.neighborhood;
         const firstResponse = questionnaire.responses[0]; // Assuming the first question is the target
 
@@ -72,29 +72,29 @@ router.get('/age-range', async (req, res) => {
   try {
     const questionnaires = await Questionnaire.find({});
     const ageRangeReport = {};
+    let totalRespondents = 0;
 
     questionnaires.forEach((questionnaire) => {
-      if (questionnaire.formData && questionnaire.formData.ageRange) {
-        const ageRange = questionnaire.formData.ageRange;
-        const firstResponse = questionnaire.responses[0]; // Assuming the first question is the target
+      totalRespondents++;
+      const ageRange = questionnaire.formData.ageRange;
+      const firstResponse = questionnaire.responses[0]; // Assuming the first question is the target
 
-        if (!ageRangeReport[ageRange]) {
-          ageRangeReport[ageRange] = {};
+      if (!ageRangeReport[ageRange]) {
+        ageRangeReport[ageRange] = {};
+      }
+
+      if (firstResponse) {
+        const answer = firstResponse.answer;
+
+        if (!ageRangeReport[ageRange][answer]) {
+          ageRangeReport[ageRange][answer] = 0;
         }
 
-        if (firstResponse) {
-          const answer = firstResponse.answer;
-
-          if (!ageRangeReport[ageRange][answer]) {
-            ageRangeReport[ageRange][answer] = 0;
-          }
-
-          ageRangeReport[ageRange][answer] += 1;
-        }
+        ageRangeReport[ageRange][answer] += 1;
       }
     });
 
-    res.json({ report: ageRangeReport });
+    res.json({ report: ageRangeReport, totalRespondents });
   } catch (error) {
     console.error('Error fetching age range report:', error);
     res.status(500).json({ error: 'Error fetching age range report' });
@@ -104,19 +104,27 @@ router.get('/age-range', async (req, res) => {
 router.get('/addresses', async (req, res) => {
   try {
     const questionnaires = await Questionnaire.find({});
-    const addressReport = [];
+    const addressReport = {};
 
     questionnaires.forEach((questionnaire) => {
       if (questionnaire.formData && questionnaire.formData.address) {
         const address = questionnaire.formData.address;
-        const neighborhood = questionnaire.formData.neighborhood; // Adicionando o bairro ao relatório
+        const name = questionnaire.formData.name;
+        const neighborhood = questionnaire.formData.neighborhood;
         const firstResponse = questionnaire.responses[0]; // Assuming the first question is the target
 
         if (firstResponse) {
-          addressReport.push({
-            neighborhood: neighborhood, // Incluindo o bairro
+          const answer = firstResponse.answer;
+
+          if (!addressReport[answer]) {
+            addressReport[answer] = [];
+          }
+
+          addressReport[answer].push({
+            name: name,
+            neighborhood: neighborhood,
             address: address,
-            answer: firstResponse.answer
+            answer: answer
           });
         }
       }

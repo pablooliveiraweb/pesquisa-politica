@@ -14,8 +14,8 @@ const ProtectedRoute = ({ Component }) => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/token/verify/${token}`);
-        setIsValidToken(response.data.valid);
+        const response = await axios.get(`http://localhost:5001/api/tokens/verify/${token}`);
+        setIsValidToken(response.data.message === 'Token is valid');
       } catch (error) {
         console.error('Error verifying token:', error);
       } finally {

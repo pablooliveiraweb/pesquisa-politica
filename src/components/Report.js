@@ -171,6 +171,7 @@ const Report = () => {
         <table>
           <thead>
             <tr>
+              <th>Nome</th>
               <th>Bairro</th>
               <th>Endereço</th>
               <th>Resposta</th>
@@ -179,6 +180,7 @@ const Report = () => {
           <tbody>
             {addressReport.map((entry, index) => (
               <tr key={index}>
+                <td>{entry.name}</td>
                 <td>{entry.neighborhood}</td>
                 <td>{entry.address}</td>
                 <td>{entry.answer}</td>
