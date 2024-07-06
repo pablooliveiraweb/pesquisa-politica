@@ -28,17 +28,23 @@ router.post('/', async (req, res) => {
 });
 
 // Rota para enviar as respostas do questionário
-router.post('/', async (req, res) => {
-  const { formData, responses } = req.body;
+// routes/questionnaire.js
 
+
+
+router.post('/', async (req, res) => {
   try {
-    const newQuestionnaire = new Questionnaire({ formData, responses });
-    await newQuestionnaire.save();
-    res.status(201).send({ message: 'Questionnaire responses saved successfully' });
+    const { formData, responses } = req.body;
+    const questionnaire = new Questionnaire({ formData, responses });
+    await questionnaire.save();
+    res.status(201).json({ message: 'Questionário salvo com sucesso.' });
   } catch (error) {
-    console.error('Error saving questionnaire responses:', error);
-    res.status(500).send({ error: 'Failed to save questionnaire responses' });
+    res.status(400).json({ error: 'Erro ao salvar o questionário.' });
   }
 });
+
+
+
+
 
 module.exports = router;

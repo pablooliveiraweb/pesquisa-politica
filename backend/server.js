@@ -51,6 +51,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/token', tokenRoutes);
+app.use('/api/report', require('./routes/report')); // Adicione esta linha
 
 // Middleware para verificar o token nas rotas de admin e relatório
 app.use('/admin', verifyTokenMiddleware);

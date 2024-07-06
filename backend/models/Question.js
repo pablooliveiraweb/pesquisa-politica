@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 
 const optionSchema = new mongoose.Schema({
-  text: String,
+  value: { type: String, required: true },
 });
 
 const questionSchema = new mongoose.Schema({
-  text: String,
+  text: { type: String, required: true },
+  type: { type: String, required: true },
   options: [optionSchema],
-  questionType: { type: String, enum: ['button', 'text'], default: 'button' }
+  placeholder: { type: String, default: '' }  // Novo campo adicionado
 });
 
-module.exports = mongoose.models.Question || mongoose.model('Question', questionSchema);
+const Question = mongoose.model('Question', questionSchema);
+
+module.exports = Question;

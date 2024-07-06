@@ -3,17 +3,26 @@ const Question = require('../models/Question');
 
 const router = express.Router();
 
-// Criar uma nova pergunta
+// Rota para criar uma nova pergunta
 router.post('/', async (req, res) => {
+  const { text, type } = req.body;
+
+  const placeholder = type === 'text' ? 'Digite aqui sua resposta' : '';
+
+  const question = new Question({
+    text,
+    type,
+    placeholder,
+  });
+
   try {
-    const question = new Question(req.body);
     await question.save();
-    res.status(201).send(question);
+    res.status(201).json(question);
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Error creating question' });
+    res.status(400).json({ message: error.message });
   }
 });
+
 
 // Rota para buscar todas as perguntas
 router.get('/', async (req, res) => {
@@ -26,17 +35,19 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Adicionar uma opção a uma pergunta específica
-router.put('/:id/add-option', async (req, res) => {
+/// Adicionar opções a uma pergunta
+router.post('/:id/options', async (req, res) => {
   try {
-    const { text } = req.body;
     const question = await Question.findById(req.params.id);
-    question.options.push({ text });
+    if (!question) {
+      return res.status(404).send('Pergunta não encontrada');
+    }
+    const newOptions = req.body.options.map(option => ({ value: option }));
+    question.options.push(...newOptions);
     await question.save();
     res.status(200).send(question);
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Error adding option to question' });
+    res.status(400).send('Erro ao adicionar opções');
   }
 });
 

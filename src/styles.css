@@ -5,15 +5,114 @@ body {
   padding: 0;
   background-color: #0056b3;
 }
-.container{
+.container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 30px;
+  padding: 20px;
   background-color: #f3f1f1;
   border: 1px solid #ccc;
   margin-top: 50px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+.container-report{
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f6f6f6;
+  padding: 30px;
+}
+
+ h2 {
+  color: #ececec;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #96ccff;
+  background-color: #0b2e4e;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+.container-report h1{
+  background-color: #232323;
+  font-size: 1.7rem;
+  padding: 10px;
+  color: #f1f1f1;
+  border-radius: 5px;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  border-bottom: 2px solid #96ccff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.error {
+  color: red;
+  margin-bottom: 20px;
+}
+
+/* styles.css */
+
+.report-container {
+  padding: 20px;
+  max-width: 70%;
+  margin: 0 auto;
+  background-color: #f4f4f4;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.report-table th {
+  background-color: #f2f2f2;
+}
+
+.report-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.report-table tr:hover {
+  background-color: #ddd;
+}
+
+.report-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: #4CAF50;
+  color: white;
+}
+
+
+
 .login-container {
   max-width: 500px;
   margin: 0 auto;
@@ -135,4 +234,274 @@ select {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
+}
+.questionnaire {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.questionnaire h3 {
+  margin-top: 0;
+}
+
+.questionnaire input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  box-sizing: border-box;
+}
+
+.questionnaire button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.questionnaire button:hover {
+  background-color: #0056b3;
+}
+
+.admin-panel {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.admin-nav {
+  width: 200px;
+  background-color: #343a40;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.admin-nav button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.admin-nav button:hover,
+.admin-nav button:focus {
+  background-color: #495057;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.admin-content ul{
+  margin-left: -30px;
+  width: 96%;
+}
+
+.admin-content h3 {
+  margin-top: 0;
+}
+
+
+
+ 
+.question-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.question-item .question-text {
+  flex: 1;
+  text-align: left;
+}
+
+.question-item .delete-button {
+  flex-shrink: 0;
+  margin-left: 10px;
+  max-width: 100px;
+}
+
+.option-list {
+  display: none;
+  margin-top: 10px;
+  
+}
+
+.option-list.visible {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  
+}
+
+.option-list {
+  display: none;
+  margin-top: 10px;
+}
+
+.option-list.visible {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.option-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 5px 10px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  
+}
+
+.option-item .option-text {
+  margin-right: 10px;
+
+}
+
+
+.option-item .delete-button {
+  margin-top: 5px;
+  align-self: flex-end;
+  max-width: 100px;
+}
+
+.question-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  width: 100%;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.question-text {
+  flex-grow: 1;
+}
+
+.question-item .delete-button {
+  margin-left: 50px;
+  max-width: 100px;
+  
+}
+
+
+.admin-content .delete-button {
+  
+  margin-top: 10px;
+
+  padding: 5px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 3px;
+  background-color: #dc3545;
+  color: white;
+  cursor: pointer;
+  max-width: 100px;
+}
+
+
+.admin-content li {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  
+  align-items: center;
+  
+}
+
+.admin-content .actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+
+.admin-content .delete-button:hover {
+  background-color: #c82333;
+}
+
+.admin-content .option-input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.admin-content .option-input select,
+.admin-content .option-input input {
+  margin-right: 10px;
+}
+
+.admin-content button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 3px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.admin-content button:hover {
+  background-color: #0056b3;
+}
+
+.admin-content input {
+  margin: 10px 0;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-content h4 {
+  margin-top: 20px;
+}
+
+.notification {
+  background-color: #dff0d8;
+  color: #3c763d;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #d6e9c6;
+  border-radius: 4px;
+}
+form{
+  max-width: 600px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 45px;
 }
