@@ -104,7 +104,7 @@ router.get('/age-range', async (req, res) => {
 router.get('/addresses', async (req, res) => {
   try {
     const questionnaires = await Questionnaire.find({});
-    const addressReport = {};
+    const addressReport = [];
 
     questionnaires.forEach((questionnaire) => {
       if (questionnaire.formData && questionnaire.formData.address) {
@@ -116,11 +116,7 @@ router.get('/addresses', async (req, res) => {
         if (firstResponse) {
           const answer = firstResponse.answer;
 
-          if (!addressReport[answer]) {
-            addressReport[answer] = [];
-          }
-
-          addressReport[answer].push({
+          addressReport.push({
             name: name,
             neighborhood: neighborhood,
             address: address,

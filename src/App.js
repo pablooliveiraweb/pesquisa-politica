@@ -15,7 +15,7 @@ const ProtectedRoute = ({ Component }) => {
     const verifyToken = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/tokens/verify/${token}`);
-        setIsValidToken(response.data.message === 'Token is valid');
+        setIsValidToken(response.data.valid);
       } catch (error) {
         console.error('Error verifying token:', error);
       } finally {

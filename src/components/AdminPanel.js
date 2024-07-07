@@ -132,6 +132,20 @@ const AdminPanel = () => {
     }
   };
 
+  const handleResetDatabase = async () => {
+    if (window.confirm('Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.')) {
+      try {
+        await axios.delete('http://localhost:5001/api/reset');
+        fetchQuestions();
+        fetchTokens();
+        setNotification('Banco de dados resetado com sucesso!');
+        setTimeout(() => setNotification(''), 3000);
+      } catch (error) {
+        console.error('Error resetting database:', error);
+      }
+    }
+  };
+
   const handleDeleteToken = async (tokenId) => {
     try {
       await axios.delete(`http://localhost:5001/api/tokens/${tokenId}`);
@@ -163,6 +177,7 @@ const AdminPanel = () => {
         <button onClick={() => setActiveSection('users')}>Usuários</button>
         <button onClick={() => setActiveSection('questions')}>Perguntas</button>
         <button onClick={() => setActiveSection('tokens')}>Tokens</button>
+        <button onClick={handleResetDatabase}>Resetar Banco de Dados</button>
       </nav>
       <div className="admin-content">
         {notification && <div className="notification">{notification}</div>}

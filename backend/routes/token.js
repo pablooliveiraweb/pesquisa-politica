@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
 const Token = require('../models/Token');
+const { v4: uuidv4 } = require('uuid');
 
-// Gerar novo token
+// Rota para gerar novo token
 router.post('/', async (req, res) => {
   try {
     const newToken = new Token({ value: uuidv4() });
@@ -15,22 +15,26 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Obter todos os tokens
-router.get('/', async (req, res) => {
+// Rota para verificar token
+router.get('/verify/:token', async (req, res) => {
   try {
-    const tokens = await Token.find();
-    res.status(200).json(tokens);
+    const token = req.params.token;
+    const existingToken = await Token.findOne({ value: token });
+    if (existingToken) {
+      res.status(200).json({ valid: true });
+    } else {
+      res.status(404).json({ valid: false });
+    }
   } catch (error) {
-    console.error('Error fetching tokens:', error);
-    res.status(500).json({ error: 'Error fetching tokens' });
+    console.error('Error verifying token:', error);
+    res.status(500).json({ error: 'Error verifying token' });
   }
 });
 
-// Excluir um token
+// Rota para excluir token
 router.delete('/:id', async (req, res) => {
   try {
-    const tokenId = req.params.id;
-    await Token.findByIdAndDelete(tokenId);
+    await Token.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Token deleted successfully' });
   } catch (error) {
     console.error('Error deleting token:', error);
@@ -38,19 +42,14 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Verificar um token
-router.get('/verify/:token', async (req, res) => {
+// Rota para buscar todos os tokens
+router.get('/', async (req, res) => {
   try {
-    const { token } = req.params;
-    const existingToken = await Token.findOne({ value: token });
-    if (existingToken) {
-      res.status(200).json({ message: 'Token is valid' });
-    } else {
-      res.status(404).json({ message: 'Token not found' });
-    }
+    const tokens = await Token.find({});
+    res.status(200).json(tokens);
   } catch (error) {
-    console.error('Error verifying token:', error);
-    res.status(500).json({ error: 'Error verifying token' });
+    console.error('Error fetching tokens:', error);
+    res.status(500).json({ error: 'Error fetching tokens' });
   }
 });
 
