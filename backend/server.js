@@ -8,6 +8,7 @@ const userRoutes = require('./routes/users');
 const tokenRoutes = require('./routes/token');
 const Token = require('./models/Token');
 const { v4: uuidv4 } = require('uuid');
+const Questionnaire = require('./models/Questionnaire'); // Adicionando a definição do modelo Questionnaire
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -52,6 +53,33 @@ app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/report', require('./routes/report'));
+
+// Rota para obter dados das entrevistas
+app.get('/api/interview-data', async (req, res) => {
+  try {
+    const interviewData = await Questionnaire.aggregate([
+      {
+        $group: {
+          _id: '$formData.neighborhood',
+          count: { $sum: 1 },
+          totalDuration: { $sum: '$duration' },
+        },
+      },
+      {
+        $project: {
+          neighborhood: '$_id',
+          count: 1,
+          totalDuration: 1,
+        },
+      },
+    ]);
+
+    res.json(interviewData);
+  } catch (error) {
+    console.error('Error fetching interview data:', error);
+    res.status(500).json({ error: 'Error fetching interview data' });
+  }
+});
 
 // Middleware para verificar o token nas rotas de admin e relatório
 app.use('/admin', verifyTokenMiddleware);

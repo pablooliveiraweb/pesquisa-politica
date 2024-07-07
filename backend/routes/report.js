@@ -124,6 +124,7 @@ router.get('/addresses', async (req, res) => {
             name: name,
             neighborhood: neighborhood,
             address: address,
+            answer: answer
           });
         }
       }
@@ -135,5 +136,32 @@ router.get('/addresses', async (req, res) => {
     res.status(500).json({ error: 'Error fetching address report' });
   }
 });
+
+router.get('/interview-data', async (req, res) => {
+  try {
+    const questionnaires = await Questionnaire.find({});
+    const interviewData = {};
+
+    questionnaires.forEach((questionnaire) => {
+      const { neighborhood, startTime, endTime } = questionnaire.formData;
+      if (!interviewData[neighborhood]) {
+        interviewData[neighborhood] = {
+          count: 0,
+          totalDuration: 0,
+        };
+      }
+
+      const duration = (new Date(endTime) - new Date(startTime)) / 1000; // Duration in seconds
+      interviewData[neighborhood].count += 1;
+      interviewData[neighborhood].totalDuration += duration;
+    });
+
+    res.json(interviewData);
+  } catch (error) {
+    console.error('Error fetching interview data:', error);
+    res.status(500).json({ error: 'Error fetching interview data' });
+  }
+});
+
 
 module.exports = router;

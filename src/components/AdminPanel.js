@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
-import { FaUsers, FaQuestion, FaKey, FaDatabase, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Bar } from 'react-chartjs-2';
+import { Chart, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import { FaUsers, FaQuestion, FaKey, FaDatabase, FaTachometerAlt } from 'react-icons/fa';
 import '../styles.css';
+
+// Registrar a escala de categoria, tooltip e outros elementos necessários
+Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [tokens, setTokens] = useState([]);
+  const [interviewData, setInterviewData] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [newQuestionType, setNewQuestionType] = useState('text');
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
@@ -20,14 +26,15 @@ const AdminPanel = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [confirmAction, setConfirmAction] = useState(null);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
-  const [revealUsers, setRevealUsers] = useState(false);
-  const [revealQuestions, setRevealQuestions] = useState(false);
-  const [revealTokens, setRevealTokens] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [showTokens, setShowTokens] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
 
   useEffect(() => {
     fetchUsers();
     fetchQuestions();
     fetchTokens();
+    fetchInterviewData();
   }, []);
 
   const fetchUsers = async () => {
@@ -54,6 +61,16 @@ const AdminPanel = () => {
       setTokens(response.data);
     } catch (error) {
       console.error('Error fetching tokens:', error);
+    }
+  };
+
+  const fetchInterviewData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/interview-data');
+      setInterviewData(response.data);
+    } catch (error) {
+      console.error('Error fetching interview data:', error);
+      setNotification('Error fetching interview data');
     }
   };
 
@@ -224,6 +241,28 @@ const AdminPanel = () => {
     setIsNavCollapsed(!isNavCollapsed);
   };
 
+  const generateChartData = () => {
+    const labels = interviewData.map(item => item.neighborhood);
+    const data = interviewData.map(item => item.count);
+    const duration = interviewData.map(item => item.totalDuration);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Número de Entrevistas',
+          data,
+          backgroundColor: 'rgba(75,192,192,0.4)',
+        },
+        {
+          label: 'Duração Total (minutos)',
+          data: duration,
+          backgroundColor: 'rgba(153,102,255,0.4)',
+        },
+      ],
+    };
+  };
+
   return (
     <div className="admin-panel">
       <nav className={`admin-nav ${isNavCollapsed ? 'collapsed' : ''}`}>
@@ -231,7 +270,7 @@ const AdminPanel = () => {
           <span className="icon">{isNavCollapsed ? '☰' : '✖'}</span>
         </button>
         <button onClick={() => setActiveSection('dashboard')}>
-          <FaUsers className="icon" /> {!isNavCollapsed && 'Dashboard'}
+          <FaTachometerAlt className="icon" /> {!isNavCollapsed && 'Dashboard'}
         </button>
         <button onClick={() => setActiveSection('users')}>
           <FaUsers className="icon" /> {!isNavCollapsed && 'Usuários'}
@@ -251,41 +290,42 @@ const AdminPanel = () => {
         {activeSection === 'dashboard' && (
           <div>
             <h3>Dashboard</h3>
-            <div className="dashboard-section">
-              <h4>Perguntas Cadastradas</h4>
-              <button onClick={() => setRevealQuestions(!revealQuestions)}>
-                {revealQuestions ? <FaEyeSlash /> : <FaEye />} {revealQuestions ? 'Esconder' : 'Revelar'}
+            {interviewData.length > 0 ? (
+              <Bar className='chart-info' data={generateChartData()} options={{ responsive: true, plugins: { tooltip: { enabled: true } } }} />
+            ) : (
+              <p>Carregando gráfico...</p>
+            )}
+            <div className="dashboard-info">
+              <h4>Perguntas Cadastradas: {questions.length}</h4>
+              <button onClick={() => setShowQuestions(!showQuestions)}>
+                {showQuestions ? 'Ocultar' : 'Mostrar'} Perguntas
               </button>
-              {revealQuestions && (
+              {showQuestions && (
                 <ul>
                   {questions.map((question) => (
                     <li key={question._id}>{question.text}</li>
                   ))}
                 </ul>
               )}
-            </div>
-            <div className="dashboard-section">
-              <h4>Usuários Cadastrados</h4>
-              <button onClick={() => setRevealUsers(!revealUsers)}>
-                {revealUsers ? <FaEyeSlash /> : <FaEye />} {revealUsers ? 'Esconder' : 'Revelar'}
+              <h4>Tokens Gerados: {tokens.length}</h4>
+              <button onClick={() => setShowTokens(!showTokens)}>
+                {showTokens ? 'Ocultar' : 'Mostrar'} Tokens
               </button>
-              {revealUsers && (
-                <ul>
-                  {users.map((user) => (
-                    <li key={user._id}>{user.username}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="dashboard-section">
-              <h4>Tokens</h4>
-              <button onClick={() => setRevealTokens(!revealTokens)}>
-                {revealTokens ? <FaEyeSlash /> : <FaEye />} {revealTokens ? 'Esconder' : 'Revelar'}
-              </button>
-              {revealTokens && (
+              {showTokens && (
                 <ul>
                   {tokens.map((token) => (
                     <li key={token._id}>{token.value}</li>
+                  ))}
+                </ul>
+              )}
+              <h4>Usuários Cadastrados: {users.length}</h4>
+              <button onClick={() => setShowUsers(!showUsers)}>
+                {showUsers ? 'Ocultar' : 'Mostrar'} Usuários
+              </button>
+              {showUsers && (
+                <ul>
+                  {users.map((user) => (
+                    <li key={user._id}>{user.username}</li>
                   ))}
                 </ul>
               )}
@@ -390,14 +430,26 @@ const AdminPanel = () => {
       </div>
 
       {/* Modal for Notifications */}
-      <Modal isOpen={isModalOpen} onRequestClose={closeModal} className="modal" overlayClassName="modal-overlay">
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        className="modal"
+        overlayClassName="modal-overlay"
+        appElement={document.getElementById('root')}
+      >
         <h2>Notification</h2>
         <p>{modalMessage}</p>
         <button onClick={closeModal}>Close</button>
       </Modal>
 
       {/* Confirm Modal */}
-      <Modal isOpen={isConfirmModalOpen} onRequestClose={closeConfirmModal} className="modal" overlayClassName="modal-overlay">
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onRequestClose={closeConfirmModal}
+        className="modal"
+        overlayClassName="modal-overlay"
+        appElement={document.getElementById('root')}
+      >
         <h2>Confirm Action</h2>
         <p>Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.</p>
         <button onClick={handleConfirm}>Confirm</button>

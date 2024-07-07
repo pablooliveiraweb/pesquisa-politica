@@ -3,19 +3,19 @@ const mongoose = require('mongoose');
 const responseSchema = new mongoose.Schema({
   question: String,
   answer: String,
+  duration: Number, // Adicionando o campo de duração para cada resposta
 });
 
 const formDataSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  neighborhood: { type: String, required: true },
-  address: { type: String, required: true },
-  ageRange: { type: String, required: true },
-  gender: { type: String, required: true },
+  name: String,
+  neighborhood: String,
+  address: String,
+  ageRange: String,
 });
 
 const questionnaireSchema = new mongoose.Schema({
-  formData: { type: formDataSchema, required: true },
-  responses: { type: [responseSchema], required: true },
+  formData: formDataSchema,
+  responses: [responseSchema],
 });
 
 module.exports = mongoose.model('Questionnaire', questionnaireSchema);
