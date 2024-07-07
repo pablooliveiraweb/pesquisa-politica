@@ -242,9 +242,30 @@ const AdminPanel = () => {
   };
 
   const generateChartData = () => {
-    const labels = interviewData.map(item => item.neighborhood);
+    const labels = interviewData.map(item => item._id);
     const data = interviewData.map(item => item.count);
     const duration = interviewData.map(item => item.totalDuration);
+    
+    const ageGroupsData = interviewData.flatMap(item => 
+      item.ageGroups ? item.ageGroups.map(ageGroup => ({
+        neighborhood: item._id,
+        ageGroup,
+        count: item.ageGroups.filter(ag => ag === ageGroup).length
+      })) : []
+    );
+
+    const ageGroups = Array.from(new Set(ageGroupsData.map(item => item.ageGroup)));
+
+    const ageGroupDatasets = ageGroups.map(ageGroup => {
+      return {
+        label: `Faixa Etária ${ageGroup}`,
+        data: labels.map(label => {
+          const ageGroupData = ageGroupsData.find(item => item.neighborhood === label && item.ageGroup === ageGroup);
+          return ageGroupData ? ageGroupData.count : 0;
+        }),
+        backgroundColor: getRandomColor(),
+      };
+    });
 
     return {
       labels,
@@ -259,8 +280,18 @@ const AdminPanel = () => {
           data: duration,
           backgroundColor: 'rgba(153,102,255,0.4)',
         },
+        ...ageGroupDatasets
       ],
     };
+  };
+
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   };
 
   return (
@@ -437,9 +468,9 @@ const AdminPanel = () => {
         overlayClassName="modal-overlay"
         appElement={document.getElementById('root')}
       >
-        <h2>Notification</h2>
+        <h2>Notificação</h2>
         <p>{modalMessage}</p>
-        <button onClick={closeModal}>Close</button>
+        <button onClick={closeModal}>Fechar</button>
       </Modal>
 
       {/* Confirm Modal */}

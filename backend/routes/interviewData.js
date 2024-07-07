@@ -1,31 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const Questionnaire = require('../models/Questionnaire');
+const Interview = require('../models/Interview');
 
-router.get('/interview-data', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const questionnaires = await Questionnaire.find({});
-    const interviewData = {};
-
-    questionnaires.forEach((questionnaire) => {
-      const neighborhood = questionnaire.formData.neighborhood;
-      if (!interviewData[neighborhood]) {
-        interviewData[neighborhood] = { count: 0, totalDuration: 0 };
+    const interviewData = await Interview.aggregate([
+      {
+        $group: {
+          _id: "$neighborhood",
+          count: { $sum: 1 },
+          totalDuration: { $sum: "$duration" },
+          ageGroups: { $push: "$ageGroup" }
+        }
       }
-      interviewData[neighborhood].count += 1;
-      interviewData[neighborhood].totalDuration += questionnaire.duration; // Certifique-se de que o campo 'duration' exista e esteja sendo salvo corretamente no modelo Questionnaire
-    });
+    ]);
 
-    const formattedData = Object.keys(interviewData).map(neighborhood => ({
-      neighborhood,
-      count: interviewData[neighborhood].count,
-      totalDuration: interviewData[neighborhood].totalDuration
-    }));
-
-    res.json(formattedData);
+    res.json(interviewData);
   } catch (error) {
-    console.error('Error fetching interview data:', error);
-    res.status(500).json({ error: 'Error fetching interview data' });
+    res.status(500).json({ message: 'Error fetching interview data' });
   }
 });
 
