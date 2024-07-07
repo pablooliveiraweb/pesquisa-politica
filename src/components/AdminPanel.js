@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Modal from 'react-modal';
+import '../styles.css'; // Certifique-se de que este arquivo CSS esteja sendo importado
+
+Modal.setAppElement('#root');
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -12,6 +16,10 @@ const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState('users');
   const [notification, setNotification] = useState('');
   const [visibleOptions, setVisibleOptions] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmCallback, setConfirmCallback] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -50,8 +58,10 @@ const AdminPanel = () => {
     try {
       await axios.put(`http://localhost:5001/api/users/${userId}/validate`);
       fetchUsers();
+      showModal('Usuário validado com sucesso!');
     } catch (error) {
       console.error('Error validating user:', error);
+      showModal('Erro ao validar usuário.');
     }
   };
 
@@ -59,14 +69,16 @@ const AdminPanel = () => {
     try {
       await axios.delete(`http://localhost:5001/api/users/${userId}`);
       fetchUsers();
+      showModal('Usuário excluído com sucesso!');
     } catch (error) {
       console.error('Error deleting user:', error);
+      showModal('Erro ao excluir usuário.');
     }
   };
 
   const handleAddQuestion = async () => {
     if (!newQuestion) {
-      alert('Por favor, insira o texto da pergunta.');
+      showModal('Por favor, insira o texto da pergunta.');
       return;
     }
 
@@ -79,29 +91,29 @@ const AdminPanel = () => {
       setNewQuestion('');
       setNewQuestionType('text');
       fetchQuestions();
-      setNotification('Pergunta cadastrada com sucesso!');
-      setTimeout(() => setNotification(''), 3000);
+      showModal('Pergunta cadastrada com sucesso!');
     } catch (error) {
       console.error('Error adding question:', error);
+      showModal('Erro ao cadastrar pergunta.');
     }
   };
 
   const handleAddOptions = async () => {
     if (!selectedQuestionId || newOptions.some(option => !option)) {
-      alert('Por favor, selecione uma pergunta e insira o texto das opções.');
+      showModal('Por favor, selecione uma pergunta e insira o texto das opções.');
       return;
     }
 
     try {
       await axios.post(`http://localhost:5001/api/questions/${selectedQuestionId}/options`, {
-        options: newOptions.filter(option => option), // Filtra opções vazias
+        options: newOptions.filter(option => option),
       });
       setNewOptions(['']);
       fetchQuestions();
-      setNotification('Opções cadastradas com sucesso!');
-      setTimeout(() => setNotification(''), 3000);
+      showModal('Opções cadastradas com sucesso!');
     } catch (error) {
       console.error('Error adding options:', error);
+      showModal('Erro ao cadastrar opções.');
     }
   };
 
@@ -109,8 +121,10 @@ const AdminPanel = () => {
     try {
       await axios.delete(`http://localhost:5001/api/questions/${questionId}`);
       fetchQuestions();
+      showModal('Pergunta excluída com sucesso!');
     } catch (error) {
       console.error('Error deleting question:', error);
+      showModal('Erro ao excluir pergunta.');
     }
   };
 
@@ -118,8 +132,10 @@ const AdminPanel = () => {
     try {
       await axios.delete(`http://localhost:5001/api/questions/${questionId}/options/${optionId}`);
       fetchQuestions();
+      showModal('Opção excluída com sucesso!');
     } catch (error) {
       console.error('Error deleting option:', error);
+      showModal('Erro ao excluir opção.');
     }
   };
 
@@ -127,22 +143,10 @@ const AdminPanel = () => {
     try {
       await axios.post('http://localhost:5001/api/tokens');
       fetchTokens();
+      showModal('Token gerado com sucesso!');
     } catch (error) {
       console.error('Error generating token:', error);
-    }
-  };
-
-  const handleResetDatabase = async () => {
-    if (window.confirm('Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.')) {
-      try {
-        await axios.delete('http://localhost:5001/api/reset');
-        fetchQuestions();
-        fetchTokens();
-        setNotification('Banco de dados resetado com sucesso!');
-        setTimeout(() => setNotification(''), 3000);
-      } catch (error) {
-        console.error('Error resetting database:', error);
-      }
+      showModal('Erro ao gerar token.');
     }
   };
 
@@ -150,9 +154,25 @@ const AdminPanel = () => {
     try {
       await axios.delete(`http://localhost:5001/api/tokens/${tokenId}`);
       fetchTokens();
+      showModal('Token excluído com sucesso!');
     } catch (error) {
       console.error('Error deleting token:', error);
+      showModal('Erro ao excluir token.');
     }
+  };
+
+  const handleResetDatabase = async () => {
+    openConfirmModal(async () => {
+      try {
+        await axios.delete('http://localhost:5001/api/reset');
+        fetchQuestions();
+        fetchTokens();
+        showModal('Banco de dados resetado com sucesso!');
+      } catch (error) {
+        console.error('Error resetting database:', error);
+        showModal('Erro ao resetar banco de dados.');
+      }
+    });
   };
 
   const addOptionField = () => {
@@ -171,6 +191,32 @@ const AdminPanel = () => {
     }));
   };
 
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openConfirmModal = (callback) => {
+    setConfirmCallback(() => callback);
+    setIsConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+    setConfirmCallback(null);
+  };
+
+  const handleConfirm = () => {
+    if (confirmCallback) {
+      confirmCallback();
+    }
+    closeConfirmModal();
+  };
+
   return (
     <div className="admin-panel">
       <nav className="admin-nav">
@@ -180,7 +226,6 @@ const AdminPanel = () => {
         <button onClick={handleResetDatabase}>Resetar Banco de Dados</button>
       </nav>
       <div className="admin-content">
-        {notification && <div className="notification">{notification}</div>}
         {activeSection === 'users' && (
           <div>
             <h3>Usuários</h3>
@@ -277,6 +322,29 @@ const AdminPanel = () => {
           </div>
         )}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Mensagem"
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <h2>Mensagem</h2>
+        <p>{modalMessage}</p>
+        <button onClick={closeModal}>Fechar</button>
+      </Modal>
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onRequestClose={closeConfirmModal}
+        contentLabel="Confirmação"
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <h2>Confirmação</h2>
+        <p>Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.</p>
+        <button onClick={handleConfirm}>Confirmar</button>
+        <button onClick={closeConfirmModal}>Cancelar</button>
+      </Modal>
     </div>
   );
 };
