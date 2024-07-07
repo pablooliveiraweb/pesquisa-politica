@@ -6,7 +6,7 @@ const Report = () => {
   const [generalReport, setGeneralReport] = useState({});
   const [neighborhoodReport, setNeighborhoodReport] = useState({});
   const [ageRangeReport, setAgeRangeReport] = useState({});
-  const [addressReport, setAddressReport] = useState([]);
+  const [addressReport, setAddressReport] = useState({});
   const [error, setError] = useState(null);
   const [totalRespondents, setTotalRespondents] = useState(0);
 
@@ -167,27 +167,30 @@ const Report = () => {
       )}
 
       <h1>Relatório por Endereço</h1>
-      {addressReport.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Bairro</th>
-              <th>Endereço</th>
-              <th>Resposta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {addressReport.map((entry, index) => (
-              <tr key={index}>
-                <td>{entry.name}</td>
-                <td>{entry.neighborhood}</td>
-                <td>{entry.address}</td>
-                <td>{entry.answer}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {Object.keys(addressReport).length > 0 ? (
+        Object.keys(addressReport).map((answer) => (
+          <div key={answer}>
+            <h2>Resposta: {answer}</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Bairro</th>
+                  <th>Endereço</th>
+                </tr>
+              </thead>
+              <tbody>
+                {addressReport[answer].map((entry, index) => (
+                  <tr key={index}>
+                    <td>{entry.name}</td>
+                    <td>{entry.neighborhood}</td>
+                    <td>{entry.address}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
       ) : (
         <p>No data available</p>
       )}
