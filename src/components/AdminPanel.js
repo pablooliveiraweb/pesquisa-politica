@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
-import '../styles.css'; // Certifique-se de que este arquivo CSS esteja sendo importado
-
-Modal.setAppElement('#root');
+import { FaUsers, FaQuestion, FaKey, FaDatabase, FaEye, FaEyeSlash } from 'react-icons/fa';
+import '../styles.css';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -13,13 +12,17 @@ const AdminPanel = () => {
   const [newQuestionType, setNewQuestionType] = useState('text');
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
   const [newOptions, setNewOptions] = useState(['']);
-  const [activeSection, setActiveSection] = useState('users');
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [notification, setNotification] = useState('');
   const [visibleOptions, setVisibleOptions] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmCallback, setConfirmCallback] = useState(null);
+  const [modalMessage, setModalMessage] = useState('');
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
+  const [revealUsers, setRevealUsers] = useState(false);
+  const [revealQuestions, setRevealQuestions] = useState(false);
+  const [revealTokens, setRevealTokens] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -106,7 +109,7 @@ const AdminPanel = () => {
 
     try {
       await axios.post(`http://localhost:5001/api/questions/${selectedQuestionId}/options`, {
-        options: newOptions.filter(option => option),
+        options: newOptions.filter(option => option), // Filtra opções vazias
       });
       setNewOptions(['']);
       fetchQuestions();
@@ -161,8 +164,8 @@ const AdminPanel = () => {
     }
   };
 
-  const handleResetDatabase = async () => {
-    openConfirmModal(async () => {
+  const handleResetDatabase = () => {
+    setConfirmAction(() => async () => {
       try {
         await axios.delete('http://localhost:5001/api/reset');
         fetchQuestions();
@@ -173,6 +176,7 @@ const AdminPanel = () => {
         showModal('Erro ao resetar banco de dados.');
       }
     });
+    openConfirmModal();
   };
 
   const addOptionField = () => {
@@ -200,32 +204,94 @@ const AdminPanel = () => {
     setIsModalOpen(false);
   };
 
-  const openConfirmModal = (callback) => {
-    setConfirmCallback(() => callback);
+  const openConfirmModal = () => {
     setIsConfirmModalOpen(true);
   };
 
   const closeConfirmModal = () => {
     setIsConfirmModalOpen(false);
-    setConfirmCallback(null);
+    setConfirmAction(null);
   };
 
   const handleConfirm = () => {
-    if (confirmCallback) {
-      confirmCallback();
+    if (confirmAction) {
+      confirmAction();
     }
     closeConfirmModal();
   };
 
+  const handleNavToggle = () => {
+    setIsNavCollapsed(!isNavCollapsed);
+  };
+
   return (
     <div className="admin-panel">
-      <nav className="admin-nav">
-        <button onClick={() => setActiveSection('users')}>Usuários</button>
-        <button onClick={() => setActiveSection('questions')}>Perguntas</button>
-        <button onClick={() => setActiveSection('tokens')}>Tokens</button>
-        <button onClick={handleResetDatabase}>Resetar Banco de Dados</button>
+      <nav className={`admin-nav ${isNavCollapsed ? 'collapsed' : ''}`}>
+        <button onClick={handleNavToggle}>
+          <span className="icon">{isNavCollapsed ? '☰' : '✖'}</span>
+        </button>
+        <button onClick={() => setActiveSection('dashboard')}>
+          <FaUsers className="icon" /> {!isNavCollapsed && 'Dashboard'}
+        </button>
+        <button onClick={() => setActiveSection('users')}>
+          <FaUsers className="icon" /> {!isNavCollapsed && 'Usuários'}
+        </button>
+        <button onClick={() => setActiveSection('questions')}>
+          <FaQuestion className="icon" /> {!isNavCollapsed && 'Perguntas'}
+        </button>
+        <button onClick={() => setActiveSection('tokens')}>
+          <FaKey className="icon" /> {!isNavCollapsed && 'Tokens'}
+        </button>
+        <button onClick={handleResetDatabase}>
+          <FaDatabase className="icon" /> {!isNavCollapsed && 'Resetar Dados'}
+        </button>
       </nav>
       <div className="admin-content">
+        {notification && <div className="notification">{notification}</div>}
+        {activeSection === 'dashboard' && (
+          <div>
+            <h3>Dashboard</h3>
+            <div className="dashboard-section">
+              <h4>Perguntas Cadastradas</h4>
+              <button onClick={() => setRevealQuestions(!revealQuestions)}>
+                {revealQuestions ? <FaEyeSlash /> : <FaEye />} {revealQuestions ? 'Esconder' : 'Revelar'}
+              </button>
+              {revealQuestions && (
+                <ul>
+                  {questions.map((question) => (
+                    <li key={question._id}>{question.text}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="dashboard-section">
+              <h4>Usuários Cadastrados</h4>
+              <button onClick={() => setRevealUsers(!revealUsers)}>
+                {revealUsers ? <FaEyeSlash /> : <FaEye />} {revealUsers ? 'Esconder' : 'Revelar'}
+              </button>
+              {revealUsers && (
+                <ul>
+                  {users.map((user) => (
+                    <li key={user._id}>{user.username}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="dashboard-section">
+              <h4>Tokens</h4>
+              <button onClick={() => setRevealTokens(!revealTokens)}>
+                {revealTokens ? <FaEyeSlash /> : <FaEye />} {revealTokens ? 'Esconder' : 'Revelar'}
+              </button>
+              {revealTokens && (
+                <ul>
+                  {tokens.map((token) => (
+                    <li key={token._id}>{token.value}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
         {activeSection === 'users' && (
           <div>
             <h3>Usuários</h3>
@@ -322,28 +388,20 @@ const AdminPanel = () => {
           </div>
         )}
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Mensagem"
-        className="modal"
-        overlayClassName="modal-overlay"
-      >
-        <h2>Mensagem</h2>
+
+      {/* Modal for Notifications */}
+      <Modal isOpen={isModalOpen} onRequestClose={closeModal} className="modal" overlayClassName="modal-overlay">
+        <h2>Notification</h2>
         <p>{modalMessage}</p>
-        <button onClick={closeModal}>Fechar</button>
+        <button onClick={closeModal}>Close</button>
       </Modal>
-      <Modal
-        isOpen={isConfirmModalOpen}
-        onRequestClose={closeConfirmModal}
-        contentLabel="Confirmação"
-        className="modal"
-        overlayClassName="modal-overlay"
-      >
-        <h2>Confirmação</h2>
+
+      {/* Confirm Modal */}
+      <Modal isOpen={isConfirmModalOpen} onRequestClose={closeConfirmModal} className="modal" overlayClassName="modal-overlay">
+        <h2>Confirm Action</h2>
         <p>Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.</p>
-        <button onClick={handleConfirm}>Confirmar</button>
-        <button onClick={closeConfirmModal}>Cancelar</button>
+        <button onClick={handleConfirm}>Confirm</button>
+        <button onClick={closeConfirmModal}>Cancel</button>
       </Modal>
     </div>
   );

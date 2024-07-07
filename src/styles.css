@@ -1,10 +1,12 @@
+/* Base Styles */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #0056b3;
   margin: 0;
   padding: 0;
-  background-color: #0056b3;
 }
+
+/* Container Styles */
 .container {
   max-width: 600px;
   margin: 0 auto;
@@ -15,14 +17,15 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.container-report{
+.container-report {
   max-width: 900px;
   margin: 0 auto;
   background-color: #f6f6f6;
   padding: 30px;
 }
 
- h2 {
+/* Headings */
+h2 {
   color: #ececec;
   font-size: 1.3rem;
   border-bottom: 2px solid #96ccff;
@@ -31,16 +34,17 @@ body {
   border-radius: 5px;
 }
 
-.container-report h1{
+.container-report h1 {
   background-color: #232323;
   font-size: 1.7rem;
   padding: 10px;
   color: #f1f1f1;
   border-radius: 5px;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   border-bottom: 2px solid #96ccff;
 }
 
+/* Table Styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -70,8 +74,7 @@ tr:nth-child(even) {
   margin-bottom: 20px;
 }
 
-/* styles.css */
-
+/* Report Container Styles */
 .report-container {
   padding: 20px;
   max-width: 70%;
@@ -85,15 +88,15 @@ tr:nth-child(even) {
   margin-bottom: 20px;
 }
 
-.report-table th,
-.report-table td {
+.report-table th, .report-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
 .report-table th {
-  background-color: #f2f2f2;
+  background-color: #4CAF50;
+  color: white;
 }
 
 .report-table tr:nth-child(even) {
@@ -104,15 +107,7 @@ tr:nth-child(even) {
   background-color: #ddd;
 }
 
-.report-table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  background-color: #4CAF50;
-  color: white;
-}
-
-
-
+/* Login Container Styles */
 .login-container {
   max-width: 500px;
   margin: 0 auto;
@@ -163,10 +158,7 @@ tr:nth-child(even) {
   margin-bottom: 10px;
 }
 
-h2 {
-  margin-top: 0;
-}
-
+/* General Button Styles */
 button {
   background-color: #007bff;
   color: white;
@@ -184,8 +176,7 @@ button:hover {
   background-color: #175ca7;
 }
 
-input,
-select {
+input, select {
   width: 98%;
   padding: 10px;
   margin: 10px 0;
@@ -215,7 +206,7 @@ select {
   justify-content: space-between;
 }
 
-/* AdminPanel.css */
+/* Modal Styles */
 .modal {
   position: fixed;
   top: 50%;
@@ -249,87 +240,7 @@ select {
   border-radius: 4px;
 }
 
-.admin-panel {
-  display: flex;
-}
-
-.admin-nav {
-  flex-shrink: 0;
-  width: 200px;
-  background: #f4f4f4;
-  padding: 20px;
-  border-right: 1px solid #ddd;
-}
-
-.admin-content {
-  flex-grow: 1;
-  padding: 20px;
-}
-
-.question-item {
-  margin-bottom: 10px;
-}
-
-.question-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-.option-list {
-  list-style: none;
-  padding-left: 20px;
-}
-
-.option-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.delete-button {
-  background: none;
-  border: none;
-  color: red;
-  cursor: pointer;
-}
-
-.questionnaire {
-  font-family: Arial, sans-serif;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.questionnaire h3 {
-  margin-top: 0;
-}
-
-.questionnaire input[type="text"] {
-  width: 100%;
-  padding: 8px;
-  margin: 10px 0;
-  box-sizing: border-box;
-}
-
-.questionnaire button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.questionnaire button:hover {
-  background-color: #0056b3;
-}
-
+/* Admin Panel Styles */
 .admin-panel {
   display: flex;
   height: 100vh;
@@ -344,6 +255,11 @@ select {
   flex-direction: column;
   align-items: flex-start;
   padding: 20px;
+  transition: width 0.3s;
+}
+
+.admin-nav.collapsed {
+  width: 60px;
 }
 
 .admin-nav button {
@@ -355,11 +271,24 @@ select {
   text-align: left;
   cursor: pointer;
   font-size: 16px;
+  display: flex;
+  align-items: center;
 }
 
-.admin-nav button:hover,
-.admin-nav button:focus {
+.admin-nav button:last-child {
+  background-color: rgb(161, 8, 8);
+}
+
+.admin-nav button:last-child:hover {
+  background-color: orange;
+}
+
+.admin-nav button:hover, .admin-nav button:focus {
   background-color: #495057;
+}
+
+.admin-nav button .icon {
+  margin-right: 10px;
 }
 
 .admin-content {
@@ -369,10 +298,9 @@ select {
   background-color: #f4f4f4;
   display: flex;
   flex-direction: column;
-  
 }
 
-.admin-content ul{
+.admin-content ul {
   margin-left: -30px;
   width: 96%;
 }
@@ -381,38 +309,27 @@ select {
   margin-top: 0;
 }
 
-
-
- 
 .question-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  width: 100%;
+}
+
+.question-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
+  width: 100%;
 }
 
-.question-item .question-text {
-  flex: 1;
-  text-align: left;
+.question-text {
+  flex-grow: 1;
 }
 
 .question-item .delete-button {
-  flex-shrink: 0;
-  margin-left: 10px;
+  margin-left: 50px;
   max-width: 100px;
-}
-
-.option-list {
-  display: none;
-  margin-top: 10px;
-  
-}
-
-.option-list.visible {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  
 }
 
 .option-list {
@@ -434,14 +351,11 @@ select {
   background-color: #f1f1f1;
   border: 1px solid #ccc;
   border-radius: 5px;
-  
 }
 
 .option-item .option-text {
   margin-right: 10px;
-
 }
-
 
 .option-item .delete-button {
   margin-top: 5px;
@@ -470,14 +384,10 @@ select {
 .question-item .delete-button {
   margin-left: 50px;
   max-width: 100px;
-  
 }
 
-
 .admin-content .delete-button {
-  
   margin-top: 10px;
-
   padding: 5px 10px;
   font-size: 14px;
   border: none;
@@ -488,23 +398,20 @@ select {
   max-width: 100px;
 }
 
-
 .admin-content li {
   margin: 10px 0;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  
   align-items: center;
-  
 }
 
 .admin-content .actions {
   display: flex;
   justify-content: flex-end;
-  width: 100%;
+  width: 35%;
+  float: right;
 }
-
 
 .admin-content .delete-button:hover {
   background-color: #c82333;
@@ -516,8 +423,7 @@ select {
   margin-bottom: 10px;
 }
 
-.admin-content .option-input select,
-.admin-content .option-input input {
+.admin-content .option-input select, .admin-content .option-input input {
   margin-right: 10px;
 }
 
@@ -558,10 +464,51 @@ select {
   border: 1px solid #d6e9c6;
   border-radius: 4px;
 }
-form{
-  max-width: 600px;
-  background-color: #f4f4f4;
-  margin: 0 auto;
-  padding: 20px;
-  margin-top: 45px;
+
+/* Dashboard Section Styles */
+.dashboard-section {
+  margin-bottom: 20px;
+}
+
+.dashboard-section h4 {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.dashboard-section button {
+  display: inline-block;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .admin-panel {
+    flex-direction: column;
+  }
+
+  .admin-nav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .admin-nav.collapsed {
+    width: 100%;
+  }
+
+  .admin-content {
+    padding: 10px;
+  }
+
+  .question-item, .option-item, .admin-content button, .admin-content input, .admin-content select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .option-list {
+    flex-direction: column;
+  }
+
+  .option-item {
+    width: 100%;
+  }
 }
