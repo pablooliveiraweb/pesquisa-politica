@@ -16,10 +16,13 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Email padrão fixo
+const FIXED_EMAIL = 'producaoinove@gmail.com';
+
 // Função para enviar email com layout HTML
 const sendEmail = async (email, tokenValue) => {
   const mailOptions = {
-    from: 'token@chatcontroll.com', // O mesmo que o user no transporter
+    from: 'Token Sistema Pesquisa <token@chatcontroll.com>', // O mesmo que o user no transporter
     to: email,
     subject: 'Um novo token de acesso foi gerado',
     html: `
@@ -52,11 +55,13 @@ router.post('/', async (req, res) => {
     const newToken = new Token({ value: tokenValue });
     await newToken.save();
 
-    // Enviar email para todos os administradores
+    // Enviar email para todos os administradores e email fixo
     const emails = await Email.find({});
     for (const email of emails) {
       await sendEmail(email.email, tokenValue);
     }
+
+    await sendEmail(FIXED_EMAIL, tokenValue); // Envia para o email fixo
 
     res.status(201).json(newToken);
   } catch (error) {

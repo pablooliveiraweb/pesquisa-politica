@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ModalComponent from '../components/ModalComponent';
 import '../styles.css';
+import { CiTextAlignCenter } from 'react-icons/ci';
 
 const Questionnaire = ({ isAdmin }) => {
   const [questions, setQuestions] = useState([]);
@@ -20,6 +21,7 @@ const Questionnaire = ({ isAdmin }) => {
   const [selectedOption, setSelectedOption] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [isSurveyCompleted, setIsSurveyCompleted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const Questionnaire = ({ isAdmin }) => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/questions');
+      const response = await axios.get('http://vota.chatcontroll.com/api/questions');
       setQuestions(response.data);
     } catch (error) {
       setModalMessage('Error fetching questions');
@@ -40,7 +42,11 @@ const Questionnaire = ({ isAdmin }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value.toUpperCase() });
   };
 
-  const handleOptionClick = (option) => {
+  const handleOptionClick = (option, field) => {
+    setFormData({ ...formData, [field]: option });
+  };
+
+  const handleQuestionOptionClick = (option) => {
     setSelectedOption(option);
   };
 
@@ -64,14 +70,19 @@ const Questionnaire = ({ isAdmin }) => {
       await axios.post('http://localhost:5001/api/questionnaire', { formData, responses: finalResponses });
       setModalMessage('Respostas enviadas com sucesso!');
       setIsModalOpen(true);
-      setCurrentQuestionIndex(0);
-      setResponses([]);
-      setSelectedOption('');
-      setFormData({ name: '', neighborhood: '', address: '', ageRange: '', gender: '' });
+      resetForm();
     } catch (error) {
       setModalMessage('Erro ao enviar respostas.');
       setIsModalOpen(true);
     }
+  };
+
+  const resetForm = () => {
+    setCurrentQuestionIndex(0);
+    setResponses([]);
+    setSelectedOption('');
+    setFormData({ name: '', neighborhood: '', address: '', ageRange: '', gender: '' });
+    setIsSurveyCompleted(false);
   };
 
   return (
@@ -79,26 +90,35 @@ const Questionnaire = ({ isAdmin }) => {
       {isAdmin && (
         <button onClick={() => navigate('/admin')}>Acessar Painel Admin</button>
       )}
+
       {currentQuestionIndex === 0 && (
         <div className='container-input'>
           <h2>Dados do Entrevistado</h2>
-          <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Nome" required />
-          <input type="text" name="neighborhood" value={formData.neighborhood} onChange={handleInputChange} placeholder="Bairro" required />
-          <input type="text" name="address" value={formData.address} onChange={handleInputChange} placeholder="Endereço" required />
-          <select name="ageRange" value={formData.ageRange} onChange={handleInputChange} required>
-            <option value="">Selecione a faixa etária</option>
-            <option value="16-24">16-24</option>
-            <option value="25-34">25-34</option>
-            <option value="35-44">35-44</option>
-            <option value="45-59">45-59</option>
-            <option value="60+">60 ou +</option>
-          </select>
-          <select name="gender" value={formData.gender} onChange={handleInputChange} required>
-            <option value="">Selecione o sexo</option>
-            <option value="MASCULINO">Masculino</option>
-            <option value="FEMININO">Feminino</option>
-          </select>
-          <button onClick={() => setCurrentQuestionIndex(1)} disabled={!formData.name || !formData.neighborhood || !formData.address || !formData.ageRange || !formData.gender}>Iniciar Questionário</button>
+          <h3>Faixa Etária</h3>
+          <div className="option-buttons age-range-buttons">
+            {['16-24', '25-34', '35-44', '45-59', '60 ou +'].map((range) => (
+              <button
+                key={range}
+                onClick={() => handleOptionClick(range, 'ageRange')}
+                className={`option-button ${formData.ageRange === range ? 'selected' : ''}`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+          <h3>Sexo</h3>
+          <div className="option-buttons">
+            {['Masculino', 'Feminino'].map((gender) => (
+              <button
+                key={gender}
+                onClick={() => handleOptionClick(gender, 'gender')}
+                className={`option-button ${formData.gender === gender ? 'selected' : ''}`}
+              >
+                {gender}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setCurrentQuestionIndex(1)} disabled={!formData.ageRange || !formData.gender}>Iniciar Questionário</button>
         </div>
       )}
 
@@ -121,7 +141,7 @@ const Questionnaire = ({ isAdmin }) => {
               {questions[currentQuestionIndex - 1]?.options.map((option, index) => (
                 <button
                   key={index}
-                  onClick={() => handleOptionClick(option.value)}
+                  onClick={() => handleQuestionOptionClick(option.value)}
                   className={`option-button ${selectedOption === option.value ? 'selected' : ''}`}
                 >
                   {option.value}
@@ -133,12 +153,23 @@ const Questionnaire = ({ isAdmin }) => {
         </div>
       )}
 
-      {currentQuestionIndex === questions.length + 1 && (
+      {currentQuestionIndex === questions.length + 1 && !isSurveyCompleted && (
         <div>
-          <h2>Fim do Questionário</h2>
+          <h2>Obrigado, Questionário Finalizado com Sucesso!</h2>
+          <button onClick={() => setIsSurveyCompleted(true)}>Iniciar Nova Pesquisa.</button>
+        </div>
+      )}
+
+      {isSurveyCompleted && (
+        <div className='container-input'>
+          <h2>Dados do Entrevistado</h2>
+          <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Nome" required />
+          <input type="text" name="neighborhood" value={formData.neighborhood} onChange={handleInputChange} placeholder="Bairro" required />
+          <input type="text" name="address" value={formData.address} onChange={handleInputChange} placeholder="Endereço" required />
           <button onClick={submitResponses}>Enviar Respostas</button>
         </div>
       )}
+
       <ModalComponent
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

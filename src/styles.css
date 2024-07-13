@@ -574,3 +574,18 @@ input, select, textarea {
   transition: width 0.4s;
 }
 
+.age-range-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.age-range-buttons .option-button {
+  flex: 0 1 calc(50% - 10px);
+  margin-bottom: 10px;
+}
+
+.age-range-buttons .option-button:last-child{
+  flex: 1 ;
+  text-align: center;
+}

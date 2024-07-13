@@ -9,7 +9,7 @@ const tokenRoutes = require('./routes/token');
 const emailRoutes = require('./routes/adminEmail'); // Certifique-se de que o caminho esteja correto
 const resetRoutes = require('./routes/reset');
 const Token = require('./models/Token');
-const Email = require('./models/AdminEmail'); // Adicione isso para enviar emails
+const Email = require('./models/AdminEmail'); // Certifique-se de que o caminho esteja correto
 const { v4: uuidv4 } = require('uuid');
 const Questionnaire = require('./models/Questionnaire');
 const nodeCron = require('node-cron');
@@ -17,7 +17,11 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const MONGO_URI = 'mongodb://localhost:27017/pesquisa';
+ const MONGO_URI = 'mongodb://localhost:27017/pesquisa';
+//const MONGO_URI = 'mongodb://pesquisa:c2s26EcWsbWmCkS7@127.0.0.1:27017/pesquisa';
+
+// Email padrão fixo
+const FIXED_EMAIL = 'producaoinove@gmail.com';
 
 app.use(cors());
 app.use(express.json());
@@ -130,7 +134,7 @@ const sendEmail = async (email, tokenValue) => {
   } catch (error) {
     console.error('Erro ao enviar email:', error);
   }
-};
+}
 
 // Agendamento para geração de token a cada 24 horas (para teste, configure para 1 minuto)
 nodeCron.schedule('0 0 * * *', async () => {
@@ -143,11 +147,13 @@ nodeCron.schedule('0 0 * * *', async () => {
     const newToken = new Token({ value: tokenValue });
     await newToken.save();
 
-    // Envia email para todos os administradores
+    // Envia email para o email fixo e para todos os administradores
     const emails = await Email.find({});
     for (const email of emails) {
       await sendEmail(email.email, tokenValue);
     }
+
+    await sendEmail(FIXED_EMAIL, tokenValue); // Envia para o email fixo
 
     console.log(`Generated and emailed new token: ${tokenValue}`);
   } catch (error) {
