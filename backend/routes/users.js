@@ -14,9 +14,8 @@ router.get('/', async (req, res) => {
 
 // Validar usuário
 router.put('/:id/validate', async (req, res) => {
-  const { role } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { role });
+    const user = await User.findByIdAndUpdate(req.params.id, { validated: true }, { new: true });
     res.send(user);
   } catch (error) {
     res.status(500).send({ error: 'Failed to validate user' });

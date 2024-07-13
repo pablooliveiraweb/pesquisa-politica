@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles.css';
 
+// eslint-disable-next-line
+import html2pdf from 'html2pdf.js';
+
 const Report = () => {
   const [generalReport, setGeneralReport] = useState({});
   const [neighborhoodReport, setNeighborhoodReport] = useState({});
@@ -69,131 +72,152 @@ const Report = () => {
     return percentages;
   };
 
+  const generatePDF = () => {
+    const element = document.getElementById('report');
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5], // margens top, left, bottom, right
+      filename: 'report.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    // Adicionar estilos adicionais para evitar corte de conteúdo
+    element.style.padding = '10px';
+    element.style.backgroundColor = 'white';
+    element.style.margin = '0';
+
+    html2pdf().from(element).set(opt).save();
+  };
+
   return (
     <div className="container-report">
-      <h1>Relatório Geral ({totalRespondents} entrevistados)</h1>
-      {error && <p className="error">{error}</p>}
-      <table>
-        <thead>
-          <tr>
-            <th>Pergunta</th>
-            <th>Resposta</th>
-            <th>Quantidade</th>
-            <th>Percentual</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(generalReport).map((question) => (
-            <React.Fragment key={question}>
-              <tr>
-                <td rowSpan={Object.keys(generalReport[question]).length}>{question}</td>
-                <td>{Object.keys(generalReport[question])[0]}</td>
-                <td>{generalReport[question][Object.keys(generalReport[question])[0]]}</td>
-                <td>{((generalReport[question][Object.keys(generalReport[question])[0]] / Object.values(generalReport[question]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
-              </tr>
-              {Object.keys(generalReport[question]).slice(1).map((answer) => (
-                <tr key={`${question}-${answer}`}>
-                  <td>{answer}</td>
-                  <td>{generalReport[question][answer]}</td>
-                  <td>{((generalReport[question][answer] / Object.values(generalReport[question]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
-                </tr>
-              ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-
-      <h1>Relatório por Bairro</h1>
-      {Object.keys(neighborhoodReport).map((neighborhood) => {
-        const percentages = calculatePercentages(neighborhoodReport[neighborhood]);
-        return (
-          <div key={neighborhood}>
-            <h2>{neighborhood}</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Resposta</th>
-                  <th>Quantidade</th>
-                  <th>Percentual</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.keys(neighborhoodReport[neighborhood]).map((answer) => (
-                  <tr key={`${neighborhood}-${answer}`}>
-                    <td>{answer}</td>
-                    <td>{neighborhoodReport[neighborhood][answer]}</td>
-                    <td>{percentages[answer]}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
-
-      <h1>Relatório de Faixa Etária</h1>
-      {Object.keys(ageRangeReport).length > 0 ? (
+      <div id="report">
+        <h1>Relatório Geral ({totalRespondents} entrevistados)</h1>
+        {error && <p className="error">{error}</p>}
         <table>
           <thead>
             <tr>
-              <th>Faixa Etária</th>
+              <th>Pergunta</th>
               <th>Resposta</th>
               <th>Quantidade</th>
               <th>Percentual</th>
             </tr>
           </thead>
           <tbody>
-            {Object.keys(ageRangeReport).map((ageRange) => (
-              <React.Fragment key={ageRange}>
+            {Object.keys(generalReport).map((question) => (
+              <React.Fragment key={question}>
                 <tr>
-                  <td rowSpan={Object.keys(ageRangeReport[ageRange]).length}>{ageRange}</td>
-                  <td>{Object.keys(ageRangeReport[ageRange])[0]}</td>
-                  <td>{ageRangeReport[ageRange][Object.keys(ageRangeReport[ageRange])[0]]}</td>
-                  <td>{((ageRangeReport[ageRange][Object.keys(ageRangeReport[ageRange])[0]] / Object.values(ageRangeReport[ageRange]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
+                  <td rowSpan={Object.keys(generalReport[question]).length}>{question}</td>
+                  <td>{Object.keys(generalReport[question])[0]}</td>
+                  <td>{generalReport[question][Object.keys(generalReport[question])[0]]}</td>
+                  <td>{((generalReport[question][Object.keys(generalReport[question])[0]] / Object.values(generalReport[question]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
                 </tr>
-                {Object.keys(ageRangeReport[ageRange]).slice(1).map((answer) => (
-                  <tr key={`${ageRange}-${answer}`}>
+                {Object.keys(generalReport[question]).slice(1).map((answer) => (
+                  <tr key={`${question}-${answer}`}>
                     <td>{answer}</td>
-                    <td>{ageRangeReport[ageRange][answer]}</td>
-                    <td>{((ageRangeReport[ageRange][answer] / Object.values(ageRangeReport[ageRange]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
+                    <td>{generalReport[question][answer]}</td>
+                    <td>{((generalReport[question][answer] / Object.values(generalReport[question]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
                   </tr>
                 ))}
               </React.Fragment>
             ))}
           </tbody>
         </table>
-      ) : (
-        <p>No data available</p>
-      )}
 
-      <h1>Relatório por Endereço</h1>
-      {Object.keys(addressReport).length > 0 ? (
-        Object.keys(addressReport).map((answer) => (
-          <div key={answer}>
-            <h2>Resposta: {answer}</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Bairro</th>
-                  <th>Endereço</th>
-                </tr>
-              </thead>
-              <tbody>
-                {addressReport[answer].map((entry, index) => (
-                  <tr key={index}>
-                    <td>{entry.name}</td>
-                    <td>{entry.neighborhood}</td>
-                    <td>{entry.address}</td>
+        <h1>Relatório por Bairro</h1>
+        {Object.keys(neighborhoodReport).map((neighborhood) => {
+          const percentages = calculatePercentages(neighborhoodReport[neighborhood]);
+          return (
+            <div key={neighborhood}>
+              <h2>{neighborhood}</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Resposta</th>
+                    <th>Quantidade</th>
+                    <th>Percentual</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))
-      ) : (
-        <p>No data available</p>
-      )}
+                </thead>
+                <tbody>
+                  {Object.keys(neighborhoodReport[neighborhood]).map((answer) => (
+                    <tr key={`${neighborhood}-${answer}`}>
+                      <td>{answer}</td>
+                      <td>{neighborhoodReport[neighborhood][answer]}</td>
+                      <td>{percentages[answer]}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+
+        <h1>Relatório de Faixa Etária</h1>
+        {Object.keys(ageRangeReport).length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Faixa Etária</th>
+                <th>Resposta</th>
+                <th>Quantidade</th>
+                <th>Percentual</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(ageRangeReport).map((ageRange) => (
+                <React.Fragment key={ageRange}>
+                  <tr>
+                    <td rowSpan={Object.keys(ageRangeReport[ageRange]).length}>{ageRange}</td>
+                    <td>{Object.keys(ageRangeReport[ageRange])[0]}</td>
+                    <td>{ageRangeReport[ageRange][Object.keys(ageRangeReport[ageRange])[0]]}</td>
+                    <td>{((ageRangeReport[ageRange][Object.keys(ageRangeReport[ageRange])[0]] / Object.values(ageRangeReport[ageRange]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
+                  </tr>
+                  {Object.keys(ageRangeReport[ageRange]).slice(1).map((answer) => (
+                    <tr key={`${ageRange}-${answer}`}>
+                      <td>{answer}</td>
+                      <td>{ageRangeReport[ageRange][answer]}</td>
+                      <td>{((ageRangeReport[ageRange][answer] / Object.values(ageRangeReport[ageRange]).reduce((acc, val) => acc + val, 0)) * 100).toFixed(2)}%</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No data available</p>
+        )}
+
+        <h1>Relatório por Endereço</h1>
+        {Object.keys(addressReport).length > 0 ? (
+          Object.keys(addressReport).map((answer) => (
+            <div key={answer}>
+              <h2>Resposta: {answer}</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Bairro</th>
+                    <th>Endereço</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {addressReport[answer].map((entry, index) => (
+                    <tr key={index}>
+                      <td>{entry.name}</td>
+                      <td>{entry.neighborhood}</td>
+                      <td>{entry.address}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))
+        ) : (
+          <p>No data available</p>
+        )}
+      </div>
+      <button onClick={generatePDF}>Gerar Relatório em PDF</button>
     </div>
   );
 };

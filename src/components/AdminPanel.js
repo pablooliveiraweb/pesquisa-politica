@@ -3,7 +3,7 @@ import axios from 'axios';
 import Modal from 'react-modal';
 import { Bar } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
-import { FaUsers, FaQuestion, FaKey, FaDatabase, FaTachometerAlt } from 'react-icons/fa';
+import { FaUsers, FaQuestion, FaKey, FaDatabase, FaTachometerAlt, FaEnvelope } from 'react-icons/fa';
 import '../styles.css';
 
 // Registrar a escala de categoria, tooltip e outros elementos necessários
@@ -13,11 +13,13 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [tokens, setTokens] = useState([]);
+  const [emails, setEmails] = useState([]);
   const [interviewData, setInterviewData] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [newQuestionType, setNewQuestionType] = useState('text');
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
   const [newOptions, setNewOptions] = useState(['']);
+  const [newEmail, setNewEmail] = useState('');
   const [activeSection, setActiveSection] = useState('dashboard');
   const [notification, setNotification] = useState('');
   const [visibleOptions, setVisibleOptions] = useState({});
@@ -34,6 +36,7 @@ const AdminPanel = () => {
     fetchUsers();
     fetchQuestions();
     fetchTokens();
+    fetchEmails();
     fetchInterviewData();
   }, []);
 
@@ -61,6 +64,15 @@ const AdminPanel = () => {
       setTokens(response.data);
     } catch (error) {
       console.error('Error fetching tokens:', error);
+    }
+  };
+
+  const fetchEmails = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/email');
+      setEmails(response.data);
+    } catch (error) {
+      console.error('Error fetching emails:', error);
     }
   };
 
@@ -178,6 +190,34 @@ const AdminPanel = () => {
     } catch (error) {
       console.error('Error deleting token:', error);
       showModal('Erro ao excluir token.');
+    }
+  };
+
+  const handleAddEmail = async () => {
+    if (!newEmail) {
+      showModal('Por favor, insira um email.');
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5001/api/email', { email: newEmail });
+      setNewEmail('');
+      fetchEmails();
+      showModal('Email adicionado com sucesso!');
+    } catch (error) {
+      console.error('Error adding email:', error);
+      showModal('Erro ao adicionar email.');
+    }
+  };
+
+  const handleDeleteEmail = async (emailId) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/email/${emailId}`);
+      fetchEmails();
+      showModal('Email excluído com sucesso!');
+    } catch (error) {
+      console.error('Error deleting email:', error);
+      showModal('Erro ao excluir email.');
     }
   };
 
@@ -311,6 +351,9 @@ const AdminPanel = () => {
         </button>
         <button onClick={() => setActiveSection('tokens')}>
           <FaKey className="icon" /> {!isNavCollapsed && 'Tokens'}
+        </button>
+        <button onClick={() => setActiveSection('emails')}>
+          <FaEnvelope className="icon" /> {!isNavCollapsed && 'Emails'}
         </button>
         <button onClick={handleResetDatabase}>
           <FaDatabase className="icon" /> {!isNavCollapsed && 'Resetar Dados'}
@@ -458,6 +501,26 @@ const AdminPanel = () => {
             </ul>
           </div>
         )}
+        {activeSection === 'emails' && (
+          <div>
+            <h3>Gerenciamento de Emails</h3>
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              placeholder="Email"
+            />
+            <button onClick={handleAddEmail}>Adicionar Email</button>
+            <ul>
+              {emails.map((email) => (
+                <li key={email._id}>
+                  {email.email}
+                  <button className="delete-button" onClick={() => handleDeleteEmail(email._id)}>Excluir</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Modal for Notifications */}
@@ -470,7 +533,7 @@ const AdminPanel = () => {
       >
         <h2>Notificação</h2>
         <p>{modalMessage}</p>
-        <button onClick={closeModal}>Fechar</button>
+        <div className="progress-bar"></div>
       </Modal>
 
       {/* Confirm Modal */}
@@ -481,10 +544,10 @@ const AdminPanel = () => {
         overlayClassName="modal-overlay"
         appElement={document.getElementById('root')}
       >
-        <h2>Confirm Action</h2>
+        <h2>Confirmar Ação</h2>
         <p>Tem certeza que deseja resetar o banco de dados? Isso excluirá todas as perguntas e respostas.</p>
-        <button onClick={handleConfirm}>Confirm</button>
-        <button onClick={closeConfirmModal}>Cancel</button>
+        <button onClick={handleConfirm}>Confirmar</button>
+        <button onClick={closeConfirmModal}>Cancelar</button>
       </Modal>
     </div>
   );

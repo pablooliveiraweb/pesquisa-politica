@@ -17,6 +17,10 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.container input{
+  margin-bottom: 10px !important;
+}
+
 .container-report {
   max-width: 900px;
   margin: 0 auto;
@@ -65,9 +69,7 @@ th {
   color: white;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
+
 
 .error {
   color: red;
@@ -130,7 +132,7 @@ tr:nth-child(even) {
 }
 
 .login-container input {
-  margin-bottom: 10px;
+  margin-bottom: 10px !important;
   padding: 8px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -295,7 +297,7 @@ input, select {
 .dashboard-info button{
   min-height: 40px;
   margin-bottom: -20px;
-  margin-top: -10px;
+  margin-top: -10px !important;
   margin-left: 0px !important;
   
 }
@@ -444,7 +446,7 @@ input, select {
 }
 
 .admin-content button {
-  margin-left: 10px;
+  margin-top: 10px;
   padding: 5px 10px;
   font-size: 14px;
   border: none;
@@ -514,3 +516,61 @@ input, select {
     width: 100%;
   }
 }
+
+/* Prevent zoom on focus for mobile */
+input[type="text"], input[type="password"], input[type="number"], input[type="email"], input[type="tel"], input[type="url"], select, textarea {
+  font-size: 16px;
+  -webkit-appearance: none; /* Remove border-radius in iOS Safari */
+  appearance: none; /* Remove border-radius in other browsers */
+  margin: 0; /* Remove margin in Firefox and Safari */
+}
+
+input, select, textarea {
+  -webkit-tap-highlight-color: transparent; /* Prevent tap highlight color */
+}
+.container-input input, select{
+  margin-bottom: 10px;
+}
+/* Modal Styles */
+.modal {
+  position: fixed;
+  min-width: 30%;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  text-align: center;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Fundo transparente preto */
+  z-index: 999;
+}
+
+/* Progress Bar Styles */
+.progress-bar {
+  width: 100%;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 10px;
+  background-color: #007bff; /* Cor principal do sistema */
+  transition: width 0.4s;
+}
+

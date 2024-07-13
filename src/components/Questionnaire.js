@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ModalComponent from '../components/ModalComponent';
 import '../styles.css';
 
 const Questionnaire = ({ isAdmin }) => {
@@ -17,6 +18,8 @@ const Questionnaire = ({ isAdmin }) => {
     gender: ''
   });
   const [selectedOption, setSelectedOption] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +31,8 @@ const Questionnaire = ({ isAdmin }) => {
       const response = await axios.get('http://localhost:5001/api/questions');
       setQuestions(response.data);
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      setModalMessage('Error fetching questions');
+      setIsModalOpen(true);
     }
   };
 
@@ -58,14 +62,15 @@ const Questionnaire = ({ isAdmin }) => {
     try {
       const finalResponses = responses.map((response, index) => response || { question: questions[index].text, answer: selectedOption });
       await axios.post('http://localhost:5001/api/questionnaire', { formData, responses: finalResponses });
-      alert('Respostas enviadas com sucesso!');
+      setModalMessage('Respostas enviadas com sucesso!');
+      setIsModalOpen(true);
       setCurrentQuestionIndex(0);
       setResponses([]);
       setSelectedOption('');
       setFormData({ name: '', neighborhood: '', address: '', ageRange: '', gender: '' });
     } catch (error) {
-      alert('Erro ao enviar respostas.');
-      console.error('Error submitting responses:', error);
+      setModalMessage('Erro ao enviar respostas.');
+      setIsModalOpen(true);
     }
   };
 
@@ -75,7 +80,7 @@ const Questionnaire = ({ isAdmin }) => {
         <button onClick={() => navigate('/admin')}>Acessar Painel Admin</button>
       )}
       {currentQuestionIndex === 0 && (
-        <div>
+        <div className='container-input'>
           <h2>Dados do Entrevistado</h2>
           <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Nome" required />
           <input type="text" name="neighborhood" value={formData.neighborhood} onChange={handleInputChange} placeholder="Bairro" required />
@@ -134,6 +139,11 @@ const Questionnaire = ({ isAdmin }) => {
           <button onClick={submitResponses}>Enviar Respostas</button>
         </div>
       )}
+      <ModalComponent
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        message={modalMessage}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import ModalComponent from '../components/ModalComponent';
 import '../styles.css';
 
 const Login = ({ onLoginSuccess }) => {
@@ -7,6 +8,8 @@ const Login = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,10 +20,16 @@ const Login = ({ onLoginSuccess }) => {
         localStorage.setItem('role', response.data.role);
         onLoginSuccess();
       } else {
-        setError('Login failed');
+        setModalMessage('Erro ao efetuar login');
+        setIsModalOpen(true);
       }
     } catch (error) {
-      setError('Login failed');
+      if (error.response && error.response.data && error.response.data.error) {
+        setModalMessage(error.response.data.error);
+      } else {
+        setModalMessage('Erro ao efetuar login');
+      }
+      setIsModalOpen(true);
     }
   };
 
@@ -30,11 +39,19 @@ const Login = ({ onLoginSuccess }) => {
       const response = await axios.post('http://localhost:5001/api/auth/register', { username, password });
       if (response.data.message === 'User registered successfully') {
         setIsLogin(true);
+        setModalMessage('Registro realizado com sucesso! Por favor, aguarde a aprovação do admin.');
+        setIsModalOpen(true);
       } else {
-        setError('Registration failed');
+        setModalMessage('Falha ao registrar usuário');
+        setIsModalOpen(true);
       }
     } catch (error) {
-      setError('Registration failed');
+      if (error.response && error.response.data && error.response.data.error) {
+        setModalMessage(error.response.data.error);
+      } else {
+        setModalMessage('Falha ao registrar usuário');
+      }
+      setIsModalOpen(true);
     }
   };
 
@@ -44,14 +61,14 @@ const Login = ({ onLoginSuccess }) => {
       <form onSubmit={isLogin ? handleLogin : handleRegister}>
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Usuário"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -62,6 +79,11 @@ const Login = ({ onLoginSuccess }) => {
       <button onClick={() => setIsLogin(!isLogin)}>
         {isLogin ? 'Registrar Usuário' : 'Já possui cadastro? Faça login'}
       </button>
+      <ModalComponent
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        message={modalMessage}
+      />
     </div>
   );
 };

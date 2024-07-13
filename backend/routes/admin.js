@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 
 const router = express.Router();
 
@@ -32,6 +33,19 @@ router.delete('/delete/:id', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send({ message: 'Error deleting user' });
+  }
+});
+
+// Atualizar email do administrador
+router.put('/email', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const admin = await Admin.findOneAndUpdate({}, { email }, { new: true, upsert: true });
+    res.status(200).json({ message: 'Email atualizado com sucesso', admin });
+  } catch (error) {
+    console.error('Erro ao atualizar email do administrador:', error);
+    res.status(500).json({ error: 'Erro ao atualizar email do administrador' });
   }
 });
 
